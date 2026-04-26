@@ -1,0 +1,43 @@
+{
+    "name": "utmstat/easybilling_pro_client",
+    "description": "Official PHP client library for EasyBilling Pro API",
+    "type": "library",
+    "keywords": ["easybilling", "billing", "invoice", "api", "client"],
+    "homepage": "https://github.com/utmstat/easybilling_pro_client",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "EasyBilling",
+            "email": "alex@utmstat.com",
+            "homepage": "https://easybilling.pro"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "ext-json": "*",
+        "ext-curl": "*",
+        "guzzlehttp/guzzle": "^7.0"
+    },
+    "require-dev": {
+    },
+    "autoload": {
+        "psr-4": {
+            "easyBilling\\": "src/"
+        }
+    },
+    "autoload-dev": {
+    },
+    "scripts": {
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.x-dev"
+        }
+    }
+}
