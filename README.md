@@ -12,6 +12,10 @@
 composer require datamonsterpro/easybilling
 ```
 
+## Помощь с интеграцией
+
+Оставьте заявку на сайте https://easybilling.pro/
+
 ## Пример команды на Yii2 для переноса клиентов в easybilling
 
 ```php
