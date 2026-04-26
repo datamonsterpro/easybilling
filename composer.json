@@ -1,9 +1,9 @@
 {
-    "name": "utmstat/easybilling_pro_client",
+    "name": "datamonsterpro/easybilling",
     "description": "Official PHP client library for EasyBilling Pro API",
     "type": "library",
     "keywords": ["easybilling", "billing", "invoice", "api", "client"],
-    "homepage": "https://github.com/utmstat/easybilling_pro_client",
+    "homepage": "https://github.com/datamonsterpro/easybilling",
     "license": "MIT",
     "authors": [
         {
