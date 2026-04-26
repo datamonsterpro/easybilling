@@ -10,7 +10,12 @@
 
 ```bash
 composer require datamonsterpro/easybilling
+
 ```
+
+## Документация SWAGGER
+
+https://app.easybilling.pro/api-docs
 
 ## Помощь с интеграцией
 
