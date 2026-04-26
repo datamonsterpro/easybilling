@@ -1,9 +1,4 @@
-# EasyBilling Pro Client
-
-Official PHP client library for the [EasyBilling Pro](https://easybilling.pro) API.
-
-[![PHP Version](https://img.shields.io/badge/php-%3E%3D7.4-blue.svg)](https://php.net)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+# EasyBilling PHP API Client
 
 ## Requirements
 
@@ -14,100 +9,71 @@ Official PHP client library for the [EasyBilling Pro](https://easybilling.pro) A
 ## Installation
 
 ```bash
-composer require easybilling/pro-client
+composer require datamonsterpro/easybilling
 ```
 
-## Quick Start
+## Пример команды на Yii2 для переноса клиентов в easybilling
 
 ```php
 <?php
 
-use EasyBilling\ProClient\EasyBillingClient;
+namespace app\commands;
 
-$client = new EasyBillingClient('your-api-key');
+use app\components\ArrayHelper;
+use app\components\Logger;
+use app\models\User;
+use easyBilling\EasyBillingClient;
+use easyBilling\models\Transaction;
+use yii\console\Controller;
 
-// List invoices
-$invoices = $client->invoices()->list(['status' => 'unpaid']);
+class EasyBillingController extends Controller
+{
 
-foreach ($invoices as $invoice) {
-    echo $invoice->getNumber() . ' — ' . $invoice->getTotal() . ' ' . $invoice->getCurrency() . PHP_EOL;
+    public function actionMigrate()
+    {
+        //выгружаем пользователей
+        $users = User::find()
+            ->where(['id' => 7])
+            ->all();
+
+        //маппинг старый и новых тарифов: id текущего тарифа => id тарифа из easybilling
+        $rateMap = [
+            1 => 167307
+        ];
+
+        //создаем клиента
+        $api = new EasyBillingClient('11a77d53-9344-4e4d-b4cd-af32b3507fda');
+
+        //id продукта из easybilling на который будем подписывать
+        $productId = 126156;
+
+        foreach ($users as $user) {
+            Logger::trace($user->email);
+
+            //создаем клиента
+            $res = $api->customer->create($user->email, $user->phone, $user->customer_id, $user->customer_id, $user->created_at);
+            if ($api->customer->getLastHttpCode() === 200) {
+                Logger::success(' - account ok');
+                $customerId = ArrayHelper::getValue($res, 'data.id');
+                $rateId = $rateMap[$user->rate_id];
+
+                //создаем подписку, нужно передать $skipTransactionRemainingDays=1 чтобы по подписке не списались средства за текущий месяц и не было двойного списания у клиента.
+                $api->subscription->create($customerId, $productId, null, $rateId, 1);
+                if ($api->subscription->getLastHttpCode() === 200) {
+                    Logger::success(' - subscription ok');
+                    $amount = $user->balance;
+                    $comment = 'Перенос средств на новый биллинг';
+                    
+                    //создаем транзакцию на зачисление текущего баланса
+                    $api->transaction->create($customerId, Transaction::ACTION_ID_INCOME, Transaction::TYPE_ID_CORRECTION, Transaction::PAYMENT_TYPE_ID_SYSTEM, $amount, null, null, null, $comment);
+                    if ($api->transaction->getLastHttpCode() === 200) {
+                        Logger::success(' - transaction ok');
+                    }
+                }
+            }
+        }
+    }
 }
-
-// Create an invoice
-$invoice = $client->invoices()->create([
-    'client_id' => 7,
-    'currency'  => 'EUR',
-    'due_date'  => '2025-12-31',
-    'items'     => [
-        ['description' => 'Web development', 'quantity' => 1, 'price' => 2500.00],
-    ],
-]);
-
-echo 'Created invoice: ' . $invoice->getNumber();
-
-// Mark as paid
-$client->invoices()->markAsPaid($invoice->getId());
-```
-
-## API Reference
-
-### Invoices
-
-```php
-$client->invoices()->list(array $filters = [])     // List invoices
-$client->invoices()->get(int $id)                   // Get single invoice
-$client->invoices()->create(array $payload)         // Create invoice
-$client->invoices()->update(int $id, array $data)   // Update invoice
-$client->invoices()->delete(int $id)                // Delete invoice
-$client->invoices()->markAsSent(int $id)            // Mark as sent
-$client->invoices()->markAsPaid(int $id)            // Mark as paid
-```
-
-### Clients
-
-```php
-$client->clients()->list(array $filters = [])     // List clients
-$client->clients()->get(int $id)                   // Get single client
-$client->clients()->create(array $payload)         // Create client
-$client->clients()->update(int $id, array $data)   // Update client
-$client->clients()->delete(int $id)                // Delete client
-```
-
-### Payments
-
-```php
-$client->payments()->list(array $filters = [])     // List payments
-$client->payments()->get(int $id)                   // Get single payment
-$client->payments()->create(array $payload)         // Record a payment
-```
-
-## Exception Handling
-
-```php
-use EasyBilling\ProClient\Exceptions\ApiException;
-use EasyBilling\ProClient\Exceptions\AuthenticationException;
-use EasyBilling\ProClient\Exceptions\RateLimitException;
-use EasyBilling\ProClient\Exceptions\NetworkException;
-
-try {
-    $invoice = $client->invoices()->get(999);
-} catch (AuthenticationException $e) {
-    // Invalid API key (401)
-} catch (RateLimitException $e) {
-    // Too many requests (429)
-} catch (NetworkException $e) {
-    // Connection issues
-} catch (ApiException $e) {
-    // Other API errors
-    echo $e->getMessage() . ' (HTTP ' . $e->getCode() . ')';
-}
-```
-
-## Running Tests
-
-```bash
-composer install
-composer test
 ```
 
 ## License
