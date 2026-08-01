@@ -18,4 +18,22 @@ class Customer extends Common
         return $res;
     }
 
+    public function get($email)
+    {
+        $params = [
+            'email' => $email,
+        ];
+        $res = $this->request('/customer', $params, 'GET');
+        return $res;
+    }
+
+    public function getBalanceByEmail($email)
+    {
+        $params = [
+            'email' => $email,
+        ];
+        $res = $this->request('/customer/get-balance-by-email', $params, 'GET');
+        return $res;
+    }
+
 }

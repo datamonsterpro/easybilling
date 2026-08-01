@@ -5,6 +5,7 @@ namespace easyBilling\models;
 use easyBilling\components\JsonHelper;
 use easyBilling\components\Logger;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 
 class Common
 {
@@ -38,11 +39,10 @@ class Common
         $response = $client->request('POST', $url, [
             'json' => $params,
             'headers' => $headers,
-            'http_errors' => false
+            'http_errors' => false,
+            'verify' => 'false'
         ]);
-
         $this->lastHttpCode = $response->getStatusCode();
-
         $result = $response->getBody()->getContents();
 
         if ($this->lastHttpCode === 200) {
