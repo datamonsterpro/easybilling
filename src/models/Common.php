@@ -5,7 +5,7 @@ namespace easyBilling\models;
 use easyBilling\components\JsonHelper;
 use easyBilling\components\Logger;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
+use function Symfony\Component\String\b;
 
 class Common
 {
@@ -36,13 +36,26 @@ class Common
             'Authorization' => 'Bearer ' . $this->token,
         ];
 
-        $response = $client->request('POST', $url, [
-            'json' => $params,
-            'headers' => $headers,
-            'http_errors' => false,
-            'verify' => 'false'
-        ]);
+        switch ($method) {
+            case 'GET':
+                $url .= '?' . http_build_query($params);
+                $response = $client->request('GET', $url, [
+                    'headers' => $headers,
+                    'http_errors' => false,
+                    'verify' => false
+                ]);
+                break;
+            default:
+                $response = $client->request('POST', $url, [
+                    'json' => $params,
+                    'headers' => $headers,
+                    'http_errors' => false,
+                    'verify' => false
+                ]);
+        }
+
         $this->lastHttpCode = $response->getStatusCode();
+
         $result = $response->getBody()->getContents();
 
         if ($this->lastHttpCode === 200) {
