@@ -27,4 +27,13 @@ class Customer extends Common
         return $res;
     }
 
+    public function createBatch($customers)
+    {
+        $params = [
+            'customers' => $customers
+        ];
+        $res = $this->request('/customer/create-batch', $params, 'POST');
+        return $res;
+    }
+
 }
