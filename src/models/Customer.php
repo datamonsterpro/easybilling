@@ -36,4 +36,14 @@ class Customer extends Common
         return $res;
     }
 
+    public function getBalanceList($limit, $offset)
+    {
+        $params = [
+            'limit' => $limit,
+            'offset' => $offset,
+        ];
+        $res = $this->request('/customer/get-balance-list', $params, 'GET');
+        return isset($res['data']) ? $res['data'] : null;
+    }
+
 }
