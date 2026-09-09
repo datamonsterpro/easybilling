@@ -5,11 +5,15 @@ namespace easyBilling\models;
 class Customer extends Common
 {
 
-    public function getInfo($email)
+    public function getInfo($email, $id = null, $externalId = null, $isIgnoreFindError = null)
     {
         $params = [
             'email' => $email,
+            'id' => $id,
+            'external_id' => $externalId,
+            'is_ignore_find_error' => $isIgnoreFindError
         ];
+
         $res = $this->request('/customer', $params, 'GET');
         return $res;
     }
