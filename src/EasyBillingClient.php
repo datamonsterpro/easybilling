@@ -2,6 +2,7 @@
 
 namespace easyBilling;
 
+use easyBilling\models\Account;
 use easyBilling\models\ClosingDoc;
 use easyBilling\models\Customer;
 use easyBilling\models\Discount;
@@ -41,8 +42,14 @@ class EasyBillingClient
      */
     public $discount;
 
+    /**
+     * @var Account
+     */
+    public $account;
+
     public function __construct($token)
     {
+        $this->account = new Account($token);
         $this->customer = new Customer($token);
         $this->subscription = new Subscription($token);
         $this->transaction = new Transaction($token);

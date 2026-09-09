@@ -15,6 +15,8 @@ class Common
 
     protected $lastHttpCode;
 
+    protected $lastUrl;
+
     const API_URL = 'https://api.easybilling.pro';
 
     public function __construct($token)
@@ -25,6 +27,16 @@ class Common
     public function getLastHttpCode()
     {
         return $this->lastHttpCode;
+    }
+
+    public function getLastUrl()
+    {
+        return $this->lastUrl;
+    }
+
+    public function getLastError()
+    {
+        return $this->lastError;
     }
 
     protected function request($route, $params, $method = 'POST')
@@ -55,6 +67,7 @@ class Common
         }
 
         $this->lastHttpCode = $response->getStatusCode();
+        $this->lastUrl = $url;
 
         $result = $response->getBody()->getContents();
 
@@ -67,5 +80,6 @@ class Common
 
         return json_decode($result, true);
     }
+
 
 }
